@@ -41,7 +41,6 @@ const MessageComponent = ({ message, user }) => {
               <a
                 href={url}
                 target="_blank"
-                rel="noopener noreferrer"
                 download
                 style={{
                   color: "black",

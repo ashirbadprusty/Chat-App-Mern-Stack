@@ -1,19 +1,22 @@
 const fileFormat = (url = "") => {
-  const fileExt = url.split("/").pop();
-
-  if (fileExt === "mp4" || fileExt === "webm" || fileExt === "ogg")
-    return "video";
-  if (fileExt === "mp3" || fileExt === "wav") return "audio";
+  const fileName = url.split("/").pop();
+  const fileExtension = fileName.split(".").pop();
   if (
-    fileExt === "png" ||
-    fileExt === "jpg" ||
-    fileExt === "jpeg" ||
-    fileExt === "gif"
+    fileExtension === "mp4" ||
+    fileExtension === "webm" ||
+    fileExtension === "ogg"
+  )
+    return "video";
+  if (fileExtension === "mp3" || fileExtension === "wav") return "audio";
+  if (
+    fileExtension === "png" ||
+    fileExtension === "jpg" ||
+    fileExtension === "jpeg" ||
+    fileExtension === "gif"
   )
     return "image";
 
   return "file";
 };
 const transformImage = (url = "", width = 100) => url;
-
 export { fileFormat, transformImage };
