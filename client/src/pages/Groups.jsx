@@ -1,16 +1,191 @@
-import React from "react";
-import { Grid, IconButton, Tooltip } from "@mui/material";
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import React, { Suspense, lazy, memo, useEffect, useState } from "react";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Drawer,
+  Grid,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import MenuIcon from "@mui/icons-material/Menu";
+import { useNavigate, useSearchParams, Link } from "react-router-dom"; // Import Link from react-router-dom
+import AvatarCard from "../components/shared/AvatarCard";
+import { sampleChats } from "../constants/SampleData";
+import { matBlack } from "../constants/color";
+import EditIcon from "@mui/icons-material/Edit";
+import DoneIcon from "@mui/icons-material/Done";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+
+const ConfirmDeleteDialog = lazy(() =>
+  import("../components/dialog/ConfirmDeleteDialog")
+);
+const AddMemberDialog = lazy(() =>
+  import("../components/dialog/AddMemberDialog")
+);
+
+const isAddMember = true;
+
 const Groups = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const chatId = searchParams.get("group");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
 
-const IconBtns = <>
-<Tooltip title='back'>
-  <IconButton>
-    <KeyboardBackspaceIcon/>
-  </IconButton>
-</Tooltip>
-</>
+  const [groupName, setGroupName] = useState("");
+  const [groupNameUpdatedvalue, setGroupNameUpdatedvalue] = useState("");
 
+  const navigateBack = () => {
+    navigate("/");
+  };
+
+  const handleMobile = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const handleMobileClose = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const updateGroupName = () => {
+    setIsEdit(false);
+    console.log(groupNameUpdatedvalue);
+  };
+
+  const openconfirmDeleteHandler = () => {
+    setConfirmDeleteDialog(true);
+    console.log("delete group");
+  };
+  const closeconfirmDeleteHandler = () => {
+    setConfirmDeleteDialog(false);
+  };
+
+  const openAddMemberHandler = () => {
+    console.log("Add Member");
+  };
+
+  const deleteHandler = () => {
+    console.log("delete handler");
+    closeconfirmDeleteHandler();
+  };
+
+  useEffect(() => {
+    setGroupName(`Group Name ${chatId}`);
+    setGroupNameUpdatedvalue(`Group Name ${chatId}`);
+
+    return () => {
+      setGroupName("");
+      setGroupNameUpdatedvalue("");
+      setIsEdit(false);
+    };
+  }, [chatId]);
+
+  const IconBtns = (
+    <>
+      <Box
+        sx={{
+          display: {
+            xs: "block",
+            sm: "none",
+            position: "fixed",
+            top: "1rem",
+            right: "1rem",
+            color: "white",
+          },
+        }}
+      >
+        <IconButton onClick={handleMobile}>
+          <MenuIcon />
+        </IconButton>
+      </Box>
+
+      <Tooltip title="back">
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: "2rem",
+            left: "2rem",
+            color: "white",
+            bgcolor: matBlack,
+            ":hover": {
+              bgcolor: "rgba(0,0,0,0.7)",
+            },
+          }}
+          onClick={navigateBack}
+        >
+          <KeyboardBackspaceIcon />
+        </IconButton>
+      </Tooltip>
+    </>
+  );
+
+  const GroupName = (
+    <Stack
+      direction={"row"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      spacing={"1rem"}
+      padding={"3rem"}
+    >
+      {isEdit ? (
+        <>
+          <TextField
+            value={groupNameUpdatedvalue}
+            onChange={(e) => setGroupNameUpdatedvalue(e.target.value)}
+          />
+          <IconButton onClick={updateGroupName}>
+            <DoneIcon />
+          </IconButton>
+        </>
+      ) : (
+        <>
+          <Typography variant="h4">{groupName}</Typography>
+          <IconButton onClick={() => setIsEdit(true)}>
+            <EditIcon />
+          </IconButton>
+        </>
+      )}
+    </Stack>
+  );
+  const ButtonGroup = (
+    <Stack
+      direction={{
+        sm: "row",
+        xs: "column-reverse",
+      }}
+      spacing={"1rem"}
+      p={{
+        sm: "1rem",
+        xs: "0",
+        md: "1rem 4rem",
+      }}
+    >
+      <Button
+        size="large"
+        color="error"
+        variant="outlined"
+        startIcon={<DeleteIcon />}
+        onClick={openconfirmDeleteHandler}
+      >
+        Delete Group
+      </Button>
+      <Button
+        size="large"
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={openAddMemberHandler}
+      >
+        Add Member
+      </Button>
+    </Stack>
+  );
   return (
     <Grid container height={"100vh"}>
       <Grid
@@ -22,25 +197,122 @@ const IconBtns = <>
           },
         }}
         sm={4}
-        bgcolor={'bisque'}
+        bgcolor={"bisque"}
       >
-        {" "}
-        Groups Lis
+        <GroupsList myGroups={sampleChats} chatId={chatId} />
       </Grid>
-      <Grid item 
-      xs={12}
-      sm={8}
-      sx={{
-        display:'flex',
-        flexDirection:'column',
-        alignItems:'center',
-        position:'relative',
-        padding: '1rem 3rem',
-      }}>
+      <Grid
+        item
+        xs={12}
+        sm={8}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          position: "relative",
+          padding: "1rem 3rem",
+        }}
+      >
         {IconBtns}
+        {groupName && (
+          <>
+            {GroupName}
+
+            <Typography
+              margin={"2rem"}
+              alignSelf={"flex-start"}
+              variant="body1"
+            >
+              Members
+            </Typography>
+            <Stack
+              maxWidth={"45rem"}
+              width={"100%"}
+              boxSizing={"border-box"}
+              padding={{
+                sm: "1rem",
+                xs: "0",
+                md: "1rem 4rem",
+              }}
+              spacing={"2rem"}
+              bgcolor={"bisque"}
+              height={"50vh"}
+              overflow={"auto"}
+            >
+              {/* Members */}
+            </Stack>
+            {ButtonGroup}
+          </>
+        )}
       </Grid>
+      {isAddMember && (
+        <Suspense fallback={<Backdrop />}>
+          <AddMemberDialog open/>
+        </Suspense>
+      )}
+      {ConfirmDeleteDialog && (
+        <Suspense fallback={<Backdrop open />}>
+          <ConfirmDeleteDialog
+            open={confirmDeleteDialog}
+            handleClose={closeconfirmDeleteHandler}
+            deleteHandler={deleteHandler}
+          />
+        </Suspense>
+      )}
+
+      <Drawer
+        sx={{
+          display: {
+            xs: "block",
+            sm: "none",
+          },
+        }}
+        open={isMobileMenuOpen}
+        onClose={handleMobileClose}
+      >
+        <Box sx={{ width: "50vw" }}>
+          <GroupsList myGroups={sampleChats} chatId={chatId} />
+        </Box>
+      </Drawer>
     </Grid>
   );
 };
+
+const GroupsList = ({ w = "100%", myGroups = [], chatId }) => (
+  <Stack sx={{ width: w }}>
+    {myGroups.length > 0 ? (
+      myGroups.map((group) => (
+        <GroupListItem group={group} chatId={chatId} key={group._id} />
+      ))
+    ) : (
+      <Typography textAlign={"center"} padding="1rem">
+        No Group
+      </Typography>
+    )}
+  </Stack>
+);
+
+const GroupListItem = memo(({ group, chatId }) => {
+  const { name, avatar, _id } = group;
+  return (
+    <Link
+      to={`?group=${_id}`}
+      onClick={(e) => {
+        if (chatId === _id) e.preventDefault();
+      }}
+      style={{ textDecoration: "none", color: "inherit" }} // Added styling to remove underline
+    >
+      <Stack
+        direction={"row"}
+        spacing={"1rem"}
+        alignItems={"center"}
+        padding={"1rem"}
+      >
+        <AvatarCard avatar={avatar} />
+        <Typography>{name}</Typography>
+      </Stack>
+    </Link>
+  );
+});
 
 export default Groups;
