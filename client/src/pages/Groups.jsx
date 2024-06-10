@@ -15,12 +15,13 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate, useSearchParams, Link } from "react-router-dom"; // Import Link from react-router-dom
 import AvatarCard from "../components/shared/AvatarCard";
-import { sampleChats } from "../constants/SampleData";
+import { sampleChats, sampleUsers } from "../constants/SampleData";
 import { matBlack } from "../constants/color";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import UserItem from "../components/shared/UserItem";
 
 const ConfirmDeleteDialog = lazy(() =>
   import("../components/dialog/ConfirmDeleteDialog")
@@ -29,7 +30,7 @@ const AddMemberDialog = lazy(() =>
   import("../components/dialog/AddMemberDialog")
 );
 
-const isAddMember = true;
+const isAddMember = false;
 
 const Groups = () => {
   const navigate = useNavigate();
@@ -70,6 +71,9 @@ const Groups = () => {
   const openAddMemberHandler = () => {
     console.log("Add Member");
   };
+  const removeMemberHandler=(id)=>{
+    console.log("Remove Member", id);
+  };
 
   const deleteHandler = () => {
     console.log("delete handler");
@@ -77,8 +81,10 @@ const Groups = () => {
   };
 
   useEffect(() => {
+   if(chatId){
     setGroupName(`Group Name ${chatId}`);
     setGroupNameUpdatedvalue(`Group Name ${chatId}`);
+   }
 
     return () => {
       setGroupName("");
@@ -235,11 +241,23 @@ const Groups = () => {
                 md: "1rem 4rem",
               }}
               spacing={"2rem"}
-              bgcolor={"bisque"}
               height={"50vh"}
               overflow={"auto"}
             >
               {/* Members */}
+              {
+                sampleUsers.map((user)=>(
+                  <UserItem user={user}
+                  key={user._id} isAdded
+                  styling={{
+                    boxShadow: "0 0 0.5rem rgba(0,0,0,0.2)",
+                    padding: "1rem 2rem",
+                    borderRadius: "1rem",
+                  }}
+                  handler={removeMemberHandler}
+                  />
+                ))
+              }
             </Stack>
             {ButtonGroup}
           </>
