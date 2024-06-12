@@ -3,7 +3,7 @@ import React from "react";
 import { useInputValidation } from "6pp";
 import { Navigate } from "react-router-dom";
 
-const isAdmin = false;
+const isAdmin = true;
 
 const AdminLogin = () => {
   const secretKey = useInputValidation("");
