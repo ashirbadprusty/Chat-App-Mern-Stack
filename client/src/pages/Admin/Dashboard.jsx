@@ -1,14 +1,29 @@
-import React from 'react'
-import AdminLayout from '../../components/layout/AdminLayout'
+import React from "react";
+import AdminLayout from "../../components/layout/AdminLayout";
+import { Container, Paper, Stack } from "@mui/material";
+import { AdminPanelSettings as AdminPanelSettingsIcon } from "@mui/icons-material";
 
 const Dashboard = () => {
-  return (
-   <AdminLayout>
-     <div>
-      Dashboard
-    </div>
-   </AdminLayout>
-  )
-}
+  const Appbar = (
+    <Paper
+      elevation={3}
+      sx={{
+        padding: "2rem",
+        margin: "2rem 0",
+        borderRadius: "1rem",
+      }}
+    >
+      <Stack>
+        <AdminPanelSettingsIcon/>
+      </Stack>
+    </Paper>
+  );
 
-export default Dashboard
+  return (
+    <AdminLayout>
+      <Container component={"main"}>{Appbar}</Container>
+    </AdminLayout>
+  );
+};
+
+export default Dashboard;
