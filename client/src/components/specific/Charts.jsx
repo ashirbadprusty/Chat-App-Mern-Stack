@@ -10,7 +10,9 @@ import {
   Tooltip,
 } from "chart.js";
 import React from "react";
-import { Line } from "react-chartjs-2";
+import { Doughnut, Line } from "react-chartjs-2";
+import { getLast7Days } from "../lib/features";
+import { green, greenLight, orange, orangeLight } from "../../constants/color";
 
 ChartJS.register(
   Tooltip,
@@ -22,6 +24,8 @@ ChartJS.register(
   ArcElement,
   Legend
 );
+
+const labels = getLast7Days();
 
 const lineChartOptions = {
   responsive: true,
@@ -49,31 +53,63 @@ const lineChartOptions = {
   },
 };
 
-const LineChart = () => {
+const LineChart = ({ value = [] }) => {
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels,
     datasets: [
       {
-        data: [1, 2, 34, 6],
+        data: value,
         label: "My First dataset",
-        fill: false,
-        borderColor: "rgba(75,192,192,1)",
-        backgroundColor: "rgba(75,192,192, 0.2)",
-      },
-      {
-        data: [1, 22, 4, 6],
-        label: "My Second dataset",
         fill: true,
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: green,
+        backgroundColor: greenLight,
       },
+      // {
+      //   data: [1, 22, 4, 6],
+      //   label: "My Second dataset",
+      //   fill: true,
+      //   borderColor: "rgba(255, 99, 132, 1)",
+      //   backgroundColor: "rgba(255, 99, 132, 0.2)",
+      // },
     ],
   };
 
   return <Line data={data} options={lineChartOptions} />;
 };
-const DoughnutChart = () => {
-  return <div>Doughnut Chart</div>;
+
+const DoughnutChartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  cutout: 120,
+};
+const DoughnutChart = ({ value = [], labels = [] }) => {
+  const data = {
+    labels,
+    datasets: [
+      {
+        data: value,
+
+        borderColor: [green, orange],
+        backgroundColor: [greenLight, orangeLight],
+        hoverBackgroundColor: [green, orange],
+        offset: 40,
+      },
+      // {
+      //   data: [1, 22, 4, 6],
+      //   label: "My Second dataset",
+      //   fill: true,
+      //   borderColor: "rgba(255, 99, 132, 1)",
+      //   backgroundColor: "rgba(255, 99, 132, 0.2)",
+      // },
+    ],
+  };
+  return <Doughnut data={data} 
+  style={{zIndex: 10}}
+  options={DoughnutChartOptions} />;
 };
 
 export { DoughnutChart, LineChart };

@@ -49,13 +49,13 @@ const Dashboard = () => {
     <Stack
       direction={{ xs: "column", sm: "row" }}
       spacing={"2rem"}
-      justifyContent={'space-between'}
-      alignItems={'center'}
+      justifyContent={"space-between"}
+      alignItems={"center"}
       margin={"2rem 0"}
     >
-      <Widget title={"Users"} value={34} Icon={<PersonIcon/>}/>
-      <Widget title={"Chats"} value={3} Icon={<GroupIcon/>}/>
-      <Widget title={"Messages"} value={454} Icon={<MessageIcon/>} />
+      <Widget title={"Users"} value={34} Icon={<PersonIcon />} />
+      <Widget title={"Chats"} value={3} Icon={<GroupIcon />} />
+      <Widget title={"Messages"} value={454} Icon={<MessageIcon />} />
     </Stack>
   );
 
@@ -64,7 +64,21 @@ const Dashboard = () => {
       <Container component={"main"}>
         {Appbar}
 
-        <Stack direction={"row"} spacing={"2rem"} flexWrap={"wrap"}>
+        <Stack
+          direction={{
+            xs: "column",
+            lg: "row",
+          }}
+          flexWrap={"wrap"}
+          justifyContent={"center"}
+          alignItems={{
+            xs: "center",
+            lg: "stretch",
+          }}
+          sx={{
+            gap: '2rem',
+          }}
+        >
           <Paper
             elevation={3}
             sx={{
@@ -72,13 +86,12 @@ const Dashboard = () => {
               borderRadius: "1rem",
               width: "100%",
               maxWidth: "45rem",
-              height: "25rem",
             }}
           >
             <Typography margin={"2rem 0"} variant="h4">
               Last Messages
             </Typography>
-           <LineChart/>
+            <LineChart value={[1, 22, 6, 45, 30, 59]} />
           </Paper>
           <Paper
             elevation={3}
@@ -92,10 +105,12 @@ const Dashboard = () => {
               position: "relative",
               maxWidth: "25rem",
               width: "100%",
-              height: "25rem",
             }}
           >
-          <DoughnutChart/>
+            <DoughnutChart
+              labels={["Single Chats", "Group Chats"]}
+              value={[23, 46]}
+            />
             <Stack
               position={"absolute"}
               direction={"row"}
@@ -118,33 +133,34 @@ const Dashboard = () => {
 
 const Widget = ({ title, value, Icon }) => (
   <Paper
-  elevation={3}
-  sx={{
-    padding: '2rem',
-    margin: '2rem 0',
-    borderRadius: '1.5rem',
-   width: '20rem',
-  }}
+    elevation={3}
+    sx={{
+      padding: "2rem",
+      margin: "2rem 0",
+      borderRadius: "1.5rem",
+      width: "20rem",
+    }}
   >
-    <Stack alignItems={'center'} spacing={'1rem'}>
-  <Typography
-  sx={{
-    color: 'rgba(0,0,0,0.7)',
-    borderRadius: '50%',
-    border: '5px solid rgba(0,0,0,0.9)',
-    width: '5rem',
-    height: '5rem',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  }}
-  >{value}</Typography>
-  <Stack direction={'row'} spacing={'1rem'} alignItems={'center'}>
-    {Icon}
-    <Typography>{title}</Typography>
-  </Stack>
+    <Stack alignItems={"center"} spacing={"1rem"}>
+      <Typography
+        sx={{
+          color: "rgba(0,0,0,0.7)",
+          borderRadius: "50%",
+          border: "5px solid rgba(0,0,0,0.9)",
+          width: "5rem",
+          height: "5rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {value}
+      </Typography>
+      <Stack direction={"row"} spacing={"1rem"} alignItems={"center"}>
+        {Icon}
+        <Typography>{title}</Typography>
+      </Stack>
     </Stack>
-  
   </Paper>
 );
 
