@@ -1,14 +1,29 @@
-import { Schema, Schema, Types, model, models } from "mongoose";
+import mongoose, {Schema,Types,model} from 'mongoose';
 
 const Schema = new Schema(
   {
+    content:String,
+    attachments: [
+      {
+        public_id: {
+          type: String,
+          required: true,
+        },
+        url: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
    sender: {
     type: Types.ObjectId,
     ref: "User",
+    require: true,
    },
    chat: {
     type: Types.ObjectId,
     ref: "Chat",
+    require: true,
    }
   },
   {
@@ -16,4 +31,4 @@ const Schema = new Schema(
   }
 );
 
-export const Chat = models.Chat || model("Chat", Schema);
+export const Message = mongoose.models.Message || model("Message", Schema);
