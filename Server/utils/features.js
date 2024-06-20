@@ -25,7 +25,7 @@ const sendToken = (res, user, code, message) => {
 
   
 
-  return res.status(code).cookie("ChatApp-token", token, cookieOption).json({
+  return res.status(code).cookie("chatapp-token", token, cookieOption).json({
     success: true,
 
     message,
