@@ -1,11 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { connectDB } from './utils/features.js';
-import userRoute from './routes/user.js';
+
 import { errorMiddleware } from './middlewares/error.js';
 import cookieParser from 'cookie-parser'
 
-
+import userRoute from './routes/user.js';
+import chatRoute from './routes/chat.js';
 
 // Load environment variables from .env file
 dotenv.config({ path: './.env' });
@@ -26,6 +27,7 @@ const startServer = async () => {
     app.use(cookieParser());
     // Routes
     app.use('/user', userRoute);
+    app.use('/chat', chatRoute);
 
     // Catch-all route for handling 404 errors
     app.use((req, res, next) => {

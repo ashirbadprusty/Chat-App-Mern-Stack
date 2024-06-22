@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 
-const cookieOption = {
+const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   httpOnly: true,
   secure: true,
@@ -25,11 +25,16 @@ const sendToken = (res, user, code, message) => {
 
   
 
-  return res.status(code).cookie("chatapp-token", token, cookieOption).json({
+  return res.status(code).cookie("chatapp-token", token, cookieOptions).json({
     success: true,
 
     message,
   });
 };
 
-export { connectDB, sendToken };
+const emitEvent = (req,event,users,data) =>{
+console.log("Emitting Event", event);
+}
+
+
+export { connectDB, sendToken, cookieOptions, emitEvent };
