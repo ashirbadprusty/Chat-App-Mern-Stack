@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 
 import userRoute from './routes/user.js';
 import chatRoute from './routes/chat.js';
+import { createUser } from './seeders/user.js';
 
 // Load environment variables from .env file
 dotenv.config({ path: './.env' });
@@ -19,6 +20,8 @@ const startServer = async () => {
     // Connect to the database
     await connectDB(mongoURI);
     console.log('Database connected successfully');
+
+
 
     const app = express();
 
