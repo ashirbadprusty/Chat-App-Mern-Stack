@@ -1,8 +1,11 @@
-import mongoose, {Schema,Types,model} from 'mongoose';
+import mongoose, { Schema, Types, model } from 'mongoose';
 
-const Schema = new Schema(
+const MessageSchema = new Schema(
   {
-    content:String,
+    content: {
+      type: String,
+      required: false,
+    },
     attachments: [
       {
         public_id: {
@@ -15,20 +18,20 @@ const Schema = new Schema(
         },
       },
     ],
-   sender: {
-    type: Types.ObjectId,
-    ref: "User",
-    require: true,
-   },
-   chat: {
-    type: Types.ObjectId,
-    ref: "Chat",
-    require: true,
-   }
+    sender: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    chat: {
+      type: Types.ObjectId,
+      ref: "Chat",
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export const Message = mongoose.models.Message || model("Message", Schema);
+export const Message = mongoose.models.Message || model("Message", MessageSchema);
