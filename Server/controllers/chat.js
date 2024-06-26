@@ -5,12 +5,12 @@ import {
   REFETCH_CHATS,
 } from "../constants/events.js";
 import { getOtherMember } from "../lib/helper.js";
-import { TryCatch, errorMiddleware } from "../middlewares/error.js";
+import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chat.js";
-import { User } from "../models/user.js";
-import { emitEvent } from "../utils/features.js";
-import { ErrorHandler } from "../utils/utility.js";
 import { Message } from "../models/message.js";
+import { User } from "../models/user.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
+import { ErrorHandler } from "../utils/utility.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
@@ -335,19 +335,73 @@ const deleteChat = TryCatch(async (req, res, next) => {
     );
   }
 
-  
+  // Here we have to delete all Messages as well as attachments or files from cloudinary
 
+  const messageWithAttachments = await Message.find({
+    chat: chatId,
+    attachments: { $exists: true, $ne: [] },
+  });
+
+  const public_ids = [];
+
+  messageWithAttachments.forEach(({ attachments }) =>
+    attachments.forEach(({ public_id }) => public_ids.push(public_id))
+  );
+
+  await Promise.all([
+    deleteFilesFromCloudinary(public_ids),
+    chat.deleteOne(),
+    Message.deleteMany({chat: chatId}),    
+  ]);
+
+
+  emitEvent(req, REFETCH_CHATS, members);
+
+  return res.status(200).json({
+    success: true,
+    message: "Chat deleted successfully",
+  })
+});
+
+const getMessages = TryCatch(async (req,res,next) =>{
+
+  const chatId = req.params.id;
+  const {page = 1} =req.query;
+
+  const resultPerPage = 20;
+  const skip = (page - 1) * resultPerPage;
+
+  const [messages, totalMessagesCount] = await Promise.all([
+    Message.find({chat: chatId})
+    .sort({ createdAt: -1})
+    .skip(skip)
+    .limit(resultPerPage)
+    .populate("sender", "name")
+    .lean(),
+    Message.countDocuments({chat: chatId}),
+  ]);
+
+
+  const totalPages = Math.ceil(totalMessagesCount / limit);
+
+  return res.status(200).json({
+    success: true,
+    messages: messages.reverse(),
+    totalPages,
+
+  })
 });
 
 export {
-  newGroupChat,
+  addMembers,
+  deleteChat,
+  getChatDetails,
   getMyChats,
   getMyGroups,
-  addMembers,
-  removeMember,
   leaveGroup,
-  sendAttachments,
-  getChatDetails,
+  newGroupChat,
+  removeMember,
   renanmeGroup,
-  deleteChat,
+  sendAttachments,
+  getMessages
 };

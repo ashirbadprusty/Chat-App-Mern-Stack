@@ -1,13 +1,13 @@
-import express from 'express';
 import dotenv from 'dotenv';
+import express from 'express';
 import { connectDB } from './utils/features.js';
 
+import cookieParser from 'cookie-parser';
 import { errorMiddleware } from './middlewares/error.js';
-import cookieParser from 'cookie-parser'
 
-import userRoute from './routes/user.js';
 import chatRoute from './routes/chat.js';
-import { createUser } from './seeders/user.js';
+import userRoute from './routes/user.js';
+import { createMessageInChat } from './seeders/chat.js';
 
 // Load environment variables from .env file
 dotenv.config({ path: './.env' });
@@ -21,6 +21,7 @@ const startServer = async () => {
     await connectDB(mongoURI);
     console.log('Database connected successfully');
 
+    createMessageInChat("667bb69f826764d946f84c23",50)
 
 
     const app = express();
