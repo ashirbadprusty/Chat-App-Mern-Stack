@@ -1,0 +1,9 @@
+export const orange ='#ea7070';
+export const orangeLight = "rgba(234,112,112,0.2)";
+export const graycolor = 'rgba(247,247,247,1)';
+export const lightblue = '#2694ab';
+export const matBlack = '#1c1c1c'
+export const bgGradient = "linear-gradient(rgb(255 255 209), rgb(249 159 159))";
+export const green = "rgba(75,192,192,1)";
+export const greenLight = "rgba(75,192,192, 0.2)";
+export const pink = '#E11D48';
