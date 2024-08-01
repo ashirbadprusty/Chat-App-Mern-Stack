@@ -36,14 +36,17 @@ const login = TryCatch(async (req, res, next) => {
   if (!user) return next(new ErrorHandler("Invalid Username or Password", 404));
 
   const isMatch = await compare(password, user.password);
-  if (!isMatch) return next(new ErrorHandler("Invalid Username or Password", 404));
+  if (!isMatch)
+    return next(new ErrorHandler("Invalid Username or Password", 404));
 
   sendToken(res, user, 200, `Welcome Back ${user.name}`);
 });
 
-const getMyProfile = TryCatch(async (req, res) => {
+const getMyProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
 
+
+  if (!user) return next(new ErrorHandler("User not found", 400));
   res.status(200).json({
     success: true,
     user,
@@ -116,17 +119,39 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
 const acceptFriendRequest = TryCatch(async (req, res, next) => {
   const { requestId, accept } = req.body;
 
+  // Check if requestId is provided
+  if (!requestId) {
+    return next(new ErrorHandler("Request ID is required", 400));
+  }
+
+  console.log("Request ID:", requestId);
+
+  // Find the request by ID and populate sender and receiver
   const request = await Request.findById(requestId)
     .populate("sender", "name")
     .populate("receiver", "name");
 
-  if (!request) return next(new ErrorHandler("Request not found", 400));
+  // Log the request object to debug
+  console.log("Request found:", request);
 
-  if (request.receiver.toString() !== req.user.toString())
+  // Check if the request exists
+  if (!request) {
+    return next(new ErrorHandler("Request not found", 400));
+  }
+
+  // Check if receiver details are present
+  if (!request.receiver || !request.receiver._id) {
+    return next(new ErrorHandler("Invalid request data", 400));
+  }
+
+  // Check if the user is authorized to accept the request
+  if (request.receiver._id.toString() !== req.user.toString()) {
     return next(
       new ErrorHandler("You are not authorized to accept this request", 401)
     );
+  }
 
+  // Handle rejection of the request
   if (!accept) {
     await request.deleteOne();
 
@@ -138,13 +163,18 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
 
   const members = [request.sender._id, request.receiver._id];
 
-  await Promise.all([
-    Chat.create({
-      members,
-      name: `${request.sender.name}-${request.receiver.name}`,
-    }),
-    request.deleteOne(),
-  ]);
+  try {
+    await Promise.all([
+      Chat.create({
+        members,
+        name: `${request.sender.name}-${request.receiver.name}`,
+      }),
+      request.deleteOne(),
+    ]);
+  } catch (error) {
+    console.error("Error processing the request:", error);
+    return next(new ErrorHandler("Error processing the request", 500));
+  }
 
   emitEvent(req, REFETCH_CHATS, members);
 
@@ -155,7 +185,7 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
   });
 });
 
-const getAllNotifications = TryCatch(async (req, res) => {
+const getMyNotifications = TryCatch(async (req, res) => {
   const requests = await Request.find({ receiver: req.user }).populate(
     "sender",
     "name avatar"
@@ -178,7 +208,11 @@ const getAllNotifications = TryCatch(async (req, res) => {
 
 export {
   acceptFriendRequest,
-  getAllNotifications, getMyProfile, login, logout, newUser, searchUser,
-  sendFriendRequest
+  getMyNotifications,
+  getMyProfile,
+  login,
+  logout,
+  newUser,
+  searchUser,
+  sendFriendRequest,
 };
-

@@ -1,7 +1,7 @@
 import express from "express";
 import {
-    acceptFriendRequest,
-  getAllNotifications,
+  acceptFriendRequest,
+  getMyNotifications,
   getMyProfile,
   login,
   logout,
@@ -9,15 +9,15 @@ import {
   searchUser,
   sendFriendRequest,
 } from "../controllers/user.js";
-import { singleAvatar } from "../middlewares/multer.js";
-import { isAuthenticated } from "../middlewares/auth.js";
 import {
-    acceptRequestValidator,
+  acceptRequestValidator,
   loginValidator,
   registerValidator,
   sendRequestValidator,
   validateHandler,
 } from "../lib/validators.js";
+import { isAuthenticated } from "../middlewares/auth.js";
+import { singleAvatar } from "../middlewares/multer.js";
 
 const app = express.Router();
 
@@ -42,6 +42,6 @@ app.put(
   acceptFriendRequest
 );
 
-app.get("/notifications", getAllNotifications);
+app.get("/notifications", getMyNotifications);
 
 export default app;
