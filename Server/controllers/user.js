@@ -6,13 +6,14 @@ import { User } from "../models/user.js";
 import { cookieOptions, emitEvent, sendToken } from "../utils/features.js";
 import { ErrorHandler } from "../utils/utility.js";
 import { Chat } from "./../models/chat.js";
+import { getOtherMember } from "./../lib/helper.js";
 
 const newUser = async (req, res) => {
   const { name, username, password, bio } = req.body;
 
   const avatar = {
     public_id: "ashirbad",
-    url: "ashirbad",
+    url: "https://avatars.githubusercontent.com/u/1667455",
   };
   try {
     const user = await User.create({
@@ -44,7 +45,6 @@ const login = TryCatch(async (req, res, next) => {
 
 const getMyProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
-
 
   if (!user) return next(new ErrorHandler("User not found", 400));
   res.status(200).json({
@@ -124,15 +124,10 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Request ID is required", 400));
   }
 
-  console.log("Request ID:", requestId);
-
   // Find the request by ID and populate sender and receiver
   const request = await Request.findById(requestId)
     .populate("sender", "name")
     .populate("receiver", "name");
-
-  // Log the request object to debug
-  console.log("Request found:", request);
 
   // Check if the request exists
   if (!request) {
@@ -206,6 +201,42 @@ const getMyNotifications = TryCatch(async (req, res) => {
   });
 });
 
+const getMyFriends = TryCatch(async (req, res) => {
+  const chatId = req.query.chatId;
+
+  const chats = await Chat.find({
+    members: req.user,
+    groupChat: false,
+  }).populate("members", "name avatar");
+
+  const friends = chats.map(({ members }) => {
+    const otherUser = getOtherMember(members, req.user);
+
+    return {
+      _id: otherUser._id,
+      name: otherUser.name,
+      avatar: otherUser.avatar.url,
+    };
+  });
+
+  if (chatId) {
+    const chat = await Chat.findById(chatId);
+
+    const availableFriends = friends.filter(
+      (friend) => !chat.members.includes(friend._id)
+    );
+    return res.status(200).json({
+      success: true,
+      friends: availableFriends,
+    });
+  } else {
+    return res.status(200).json({
+      success: true,
+      friends,
+    });
+  }
+});
+
 export {
   acceptFriendRequest,
   getMyNotifications,
@@ -215,4 +246,5 @@ export {
   newUser,
   searchUser,
   sendFriendRequest,
+  getMyFriends,
 };

@@ -7,6 +7,7 @@ import { errorMiddleware } from './middlewares/error.js';
 
 import chatRoute from './routes/chat.js';
 import userRoute from './routes/user.js';
+import adminRoute from './routes/admin.js';
 
 // Load environment variables from .env file
 dotenv.config({ path: './.env' });
@@ -29,6 +30,7 @@ const startServer = async () => {
     // Routes
     app.use('/user', userRoute);
     app.use('/chat', chatRoute);
+    app.use('/admin', adminRoute);
 
     // Catch-all route for handling 404 errors
     app.use((req, res, next) => {
