@@ -78,6 +78,11 @@ const acceptRequestValidator = () => [
   .withMessage("Accept must be a boolean"),
 ];
 
+const adminLoginValidator = () => [
+  body("secretKey", "Please Enter your Secret KEY").notEmpty(),
+
+];
+
 
 export {
   addMemberValidator,
@@ -91,4 +96,5 @@ export {
   renameValidator,
   sendRequestValidator,
   acceptRequestValidator,
+  adminLoginValidator
 };

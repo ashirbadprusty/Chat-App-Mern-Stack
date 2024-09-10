@@ -31,6 +31,9 @@ const startServer = async () => {
     app.use('/user', userRoute);
     app.use('/chat', chatRoute);
     app.use('/admin', adminRoute);
+    app.get('/', (req,res)=>{
+      res.send('Welcome to the Server');
+    });
 
     // Catch-all route for handling 404 errors
     app.use((req, res, next) => {
