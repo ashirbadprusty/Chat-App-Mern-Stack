@@ -1,15 +1,14 @@
+import jwt from "jsonwebtoken";
+import { adminSecretKey } from "../app.js";
 import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chat.js";
 import { Message } from "../models/message.js";
 import { User } from "../models/user.js";
-import { ErrorHandler } from "../utils/utility.js";
-import jwt from "jsonwebtoken";
 import { cookieOptions } from "../utils/features.js";
+import { ErrorHandler } from "../utils/utility.js";
 
 const admninLogin = TryCatch(async (req, res, next) => {
   const { secretKey } = req.body;
-
-  const adminSecretKey = process.env.ADMIN_SECRET_KEY || "ashirbadprusty";
 
   const isMatched = secretKey === adminSecretKey;
 
@@ -27,6 +26,7 @@ const admninLogin = TryCatch(async (req, res, next) => {
       message: "Authenticated successfully, Welcome BOSS",
     });
 });
+
 const admninLogout = TryCatch(async (req, res, next) => {
   return res
     .status(200)
@@ -38,6 +38,12 @@ const admninLogout = TryCatch(async (req, res, next) => {
       success: true,
       message: "Logout successfully",
     });
+});
+
+const getAdminData = TryCatch(async (req, res, next) => {
+  return res.status(200).json({
+    admin: true,
+  });
 });
 // Fetch all users
 const allUsers = TryCatch(async (req, res) => {
@@ -176,4 +182,12 @@ const getDashboardStats = TryCatch(async (req, res) => {
   });
 });
 
-export { allUsers, allChats, allMessages, getDashboardStats, admninLogin, admninLogout };
+export {
+  admninLogin,
+  admninLogout,
+  allChats,
+  allMessages,
+  allUsers,
+  getAdminData,
+  getDashboardStats,
+};

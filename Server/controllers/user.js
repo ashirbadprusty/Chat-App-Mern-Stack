@@ -5,30 +5,31 @@ import { Request } from "../models/request.js";
 import { User } from "../models/user.js";
 import { cookieOptions, emitEvent, sendToken } from "../utils/features.js";
 import { ErrorHandler } from "../utils/utility.js";
-import { Chat } from "./../models/chat.js";
 import { getOtherMember } from "./../lib/helper.js";
+import { Chat } from "./../models/chat.js";
 
-const newUser = async (req, res) => {
+const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
+
+  const file = req.file;
+
+  if (!file) return next(new ErrorHandler("Please upload avatar"));
 
   const avatar = {
     public_id: "ashirbad",
     url: "https://avatars.githubusercontent.com/u/1667455",
   };
-  try {
-    const user = await User.create({
-      name,
-      bio,
-      username,
-      password,
-      avatar,
-    });
 
-    sendToken(res, user, 201, "User Created");
-  } catch (error) {
-    res.status(400).json({ message: "Error creating user", error });
-  }
-};
+  const user = await User.create({
+    name,
+    bio,
+    username,
+    password,
+    avatar,
+  });
+
+  sendToken(res, user, 201, "User Created");
+});
 
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
@@ -239,6 +240,7 @@ const getMyFriends = TryCatch(async (req, res) => {
 
 export {
   acceptFriendRequest,
+  getMyFriends,
   getMyNotifications,
   getMyProfile,
   login,
@@ -246,5 +248,4 @@ export {
   newUser,
   searchUser,
   sendFriendRequest,
-  getMyFriends,
 };

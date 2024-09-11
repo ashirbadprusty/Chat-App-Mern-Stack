@@ -1,5 +1,4 @@
 import express from "express";
-import { isAuthenticated } from "../middlewares/auth.js";
 import {
   addMembers,
   deleteChat,
@@ -13,7 +12,6 @@ import {
   renanmeGroup,
   sendAttachments,
 } from "../controllers/chat.js";
-import { attachmentsMulter } from "../middlewares/multer.js";
 import {
   addMemberValidator,
   chatIdvalidator,
@@ -23,6 +21,8 @@ import {
   sendAttachmentsValidator,
   validateHandler,
 } from "../lib/validators.js";
+import { isAuthenticated } from "../middlewares/auth.js";
+import { attachmentsMulter } from "../middlewares/multer.js";
 
 const app = express.Router();
 
